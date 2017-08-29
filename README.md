@@ -1,4 +1,4 @@
-###Simple example of embedding the kotlin script engine into a standalone console application.
+### Simple example of embedding the kotlin script engine into a standalone console application.
 
 #### Building
 `./gradlew shadowJar`
