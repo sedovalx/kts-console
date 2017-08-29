@@ -1,0 +1,1 @@
+Simple example of embedding the kotlin script engine into a standalone console application. 
