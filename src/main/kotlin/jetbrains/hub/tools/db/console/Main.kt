@@ -30,7 +30,7 @@ class HubConsole {
         val result = try {
             engine.eval(input)
         } catch (ex: Exception) {
-            println(ex)
+            ex.printStackTrace()
             return true
         }
 
