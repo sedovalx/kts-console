@@ -1,7 +1,6 @@
 package jetbrains.hub.tools.db.console
 
-import javax.script.ScriptEngine
-import javax.script.ScriptEngineManager
+import javax.script.*
 
 
 fun main(args: Array<String>) {
@@ -14,13 +13,16 @@ class HubConsole {
     }
 
     private fun startREPL() {
-        val engine = ScriptEngineManager().getEngineByExtension("kts")!!
+        val engineFactory = ScriptEngineManager().getEngineByExtension("kts")?.factory!!
 
         var i = 0
-        while (cycleREPL(engine, i++)) { }
+        val bindings = SimpleBindings()
+        while (cycleREPL(engineFactory, bindings, i++)) { }
     }
 
-    private fun cycleREPL(engine: ScriptEngine, i: Int): Boolean {
+    private fun cycleREPL(engineFactory: ScriptEngineFactory, bindings: SimpleBindings, i: Int): Boolean {
+        val engine = engineFactory.scriptEngine
+        engine.setBindings(bindings, ScriptContext.ENGINE_SCOPE)
         print("> ")
         val input = readLine() ?: "exit"
         if (input == "exit") {
@@ -34,8 +36,8 @@ class HubConsole {
             return true
         }
 
-        if (result !is Unit) {
-            engine.put("res$i", result)
+        if (result != null) {
+            bindings.put("res$i", result)
             println("res$i: ${result.javaClass.name}@${Integer.toHexString(result.hashCode())} = $result")
         } else {
             println("Unit")
