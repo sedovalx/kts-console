@@ -13,16 +13,13 @@ class HubConsole {
     }
 
     private fun startREPL() {
-        val engineFactory = ScriptEngineManager().getEngineByExtension("kts")?.factory!!
+        val engine = ScriptEngineManager().getEngineByExtension("kts")!!
 
         var i = 0
-        val bindings = SimpleBindings()
-        while (cycleREPL(engineFactory, bindings, i++)) { }
+        while (cycleREPL(engine, i++)) { }
     }
 
-    private fun cycleREPL(engineFactory: ScriptEngineFactory, bindings: SimpleBindings, i: Int): Boolean {
-        val engine = engineFactory.scriptEngine
-        engine.setBindings(bindings, ScriptContext.ENGINE_SCOPE)
+    private fun cycleREPL(engine: ScriptEngine, i: Int): Boolean {
         print("> ")
         val input = readLine() ?: "exit"
         if (input == "exit") {
@@ -32,13 +29,14 @@ class HubConsole {
         val result = try {
             engine.eval(input)
         } catch (ex: Exception) {
+            // https://youtrack.jetbrains.com/v2/issue/KT-17921
             ex.printStackTrace()
             return true
         }
 
         if (result != null) {
-            bindings.put("res$i", result)
-            println("res$i: ${result.javaClass.name}@${Integer.toHexString(result.hashCode())} = $result")
+            engine.put("res$i", result)
+            println("res$i: ${result.javaClass.kotlin.simpleName}@${Integer.toHexString(result.hashCode())} = $result")
         } else {
             println("Unit")
         }
